@@ -1,0 +1,48 @@
+:root {
+  color-scheme: light dark;
+
+  --shell: #f4f5f3;
+  --surface: #ffffff;
+  --ink: #1d2127;
+  --ink-soft: #3a4049;
+  --muted: #5c636e;
+  --line: #e1e3e2;
+  --chip: #e8eae9;
+  --field: #d3d6d5;
+  --wood: #a8794f;
+  --danger: #b42318;
+
+  --state-listening: #3f7bff;
+  --state-thinking: #e9a23b;
+  --state-speaking: #f0643c;
+  --state-asleep: #9aa0a8;
+  --state-idle: #3f7bff;
+  --state: var(--state-idle);
+
+  --font-ui: "Segoe UI Variable Text", "Segoe UI", -apple-system, "SF Pro Text", system-ui, sans-serif;
+  --font-voice: "Recursive Variable", var(--font-ui);
+
+  --radius-s: 10px;
+  --radius-m: 14px;
+  --radius-l: 22px;
+  --rail: 72px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shell: #15181c;
+    --surface: #1d2127;
+    --ink: #eef0ef;
+    --ink-soft: #c9cdd2;
+    --muted: #a3a9b2;
+    --line: #2c3139;
+    --chip: #262b32;
+    --field: #3a4049;
+    --danger: #ff8a7a;
+  }
+}
+
+:root[data-phase="listening"] { --state: var(--state-listening); }
+:root[data-phase="thinking"] { --state: var(--state-thinking); }
+:root[data-phase="speaking"] { --state: var(--state-speaking); }
+:root[data-phase="asleep"] { --state: var(--state-asleep); }

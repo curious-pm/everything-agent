@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "everything_agent"
+version = "0.1.0"
+description = "Everything Agent: a fast, hands-free voice conversation app for Reachy Mini, with a web and desktop UI."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Curious PM" }]
+requires-python = ">=3.11"
+dependencies = [
+    "reachy-mini>=1.9",
+    "httpx>=0.28",
+    "websockets>=13",
+    "numpy",
+    "python-dotenv",
+    "platformdirs",
+    "fastapi",
+    "uvicorn",
+    "psutil>=5.9",
+    "tzdata",
+]
+keywords = ["reachy-mini-app", "reachy_mini", "voice", "conversation"]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/curious-pm/Everything-Agent"
+Issues = "https://github.com/curious-pm/Everything-Agent/issues"
+Changelog = "https://github.com/curious-pm/Everything-Agent/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23"]
+package = ["pyinstaller>=6"]
+
+[project.scripts]
+everything-agent = "everything_agent.__main__:main"
+everything-agent-desktop = "everything_agent.desktop.__main__:main"
+
+[project.entry-points."reachy_mini_apps"]
+everything_agent = "everything_agent.main:EverythingAgent"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+everything_agent = ["web/**/*", "py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.uv]
+required-environments = [
+    "sys_platform == 'win32' and platform_machine == 'AMD64' and python_version == '3.12'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version == '3.12'",
+]

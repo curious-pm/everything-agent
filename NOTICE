@@ -1,0 +1,14 @@
+Everything Agent
+Copyright 2026 Curious PM
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The desktop installers also contain third-party software under their own licenses, listed in
+THIRD_PARTY_LICENSES.txt, installed with the app. Among them is GStreamer, licensed under the GNU
+Lesser General Public License 2.1; its source code is available from
+https://gstreamer.freedesktop.org/src/ and the exact builds used come from the gstreamer-*
+packages on PyPI.
+
+Everything Agent is an independent project. It is not affiliated with or endorsed by Pollen
+Robotics, Hugging Face or Anthropic. Reachy is a trademark of Pollen Robotics;
+Claude and Claude Code are trademarks of Anthropic, PBC.

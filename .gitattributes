@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+*.png binary
+*.ico binary
+*.icns binary
+*.woff2 binary
+*.stl binary
+
+src/everything_agent/web/** linguist-generated
+*.lock linguist-generated
+package-lock.json linguist-generated

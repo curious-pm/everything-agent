@@ -1,0 +1,22 @@
+name: Feature request
+description: An idea for something Reachy could do.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like Reachy to do?
+      description: Describe it from the user's side, as a conversation if that helps.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: What it would make possible, or what's hard today.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to build this myself (see CONTRIBUTING.md).

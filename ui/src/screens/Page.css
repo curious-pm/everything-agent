@@ -1,0 +1,174 @@
+.page {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 32px 40px;
+}
+
+.page h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.page-sub {
+  margin: 4px 0 28px;
+}
+
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.columns > section {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.page h2 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows > li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.rows .grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.rows .time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--field);
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 500;
+}
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 10px;
+  color: var(--ink-soft);
+}
+
+.slider input {
+  accent-color: var(--ink);
+}
+
+.empty {
+  padding: 12px 0;
+  color: var(--muted);
+}
+
+.page-error {
+  color: var(--danger);
+}
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.rows > li.stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 28px;
+  border-radius: var(--radius-m);
+  background: var(--chip);
+}
+
+.inline-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.inline-form label .field {
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.segmented {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--chip);
+}
+
+.segmented button {
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.segmented.small button {
+  height: 28px;
+  padding: 0 10px;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--shell);
+}

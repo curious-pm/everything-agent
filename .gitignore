@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.pytest_cache/
+build/
+dist/
+.env
+
+node_modules/
+ui/public/robot/
+src/everything_agent/web/robot/
+
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+desktop/src-tauri/core/
+*.log

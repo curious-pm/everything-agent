@@ -1,0 +1,85 @@
+.first-run {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.first-run-inner {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.first-run-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.first-run-line {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.first-run-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.first-run .option {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+
+.first-run .option input {
+  margin-top: 4px;
+  accent-color: var(--ink);
+}
+
+.first-run .option > span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.first-run-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.first-run-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.first-run-fields .field {
+  font-weight: 400;
+}
+
+.first-run-fields a {
+  margin-top: -8px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.first-run-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 12px;
+}
