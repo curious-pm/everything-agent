@@ -313,3 +313,49 @@ async def test_a_quick_tool_result_goes_back_to_the_model():
     assert rounds[1][-2]["tool_calls"][0]["function"]["name"] == "clock"
     assert voice.spoken == ["It's noon right now."]
     assert [m["role"] for m in conversation.history.messages] == ["user", "assistant"]
+
+
+class StreamedLookUp(Tool):
+    name = "look_up"
+    follow_up = False
+    ack = "Let me look into that."
+
+    def __init__(self):
+        self.sent_second_sentence_at = None
+
+    async def run(self, args, ctx):
+        async def answer():
+            await asyncio.sleep(0.2)
+            yield "Canberra is the capital. "
+            await asyncio.sleep(0.6)
+            self.sent_second_sentence_at = time.monotonic()
+            yield "It was a compromise."
+
+        ctx.announce_stream(answer())
+        return "working on it"
+
+
+async def test_a_streamed_answer_is_spoken_sentence_by_sentence():
+    robot = FakeRobot()
+    conversation, events, voice, _, _ = make(robot)
+    tool = StreamedLookUp()
+    first_spoken_at = []
+    stream = voice.stream
+
+    async def timed(text):
+        if text.startswith("Canberra"):
+            first_spoken_at.append(time.monotonic())
+        async for audio in stream(text):
+            yield audio
+
+    async def calls_tool(messages, tools=None):
+        yield ToolCall("c1", "look_up", "{}")
+
+    voice.stream = timed
+    conversation.providers.stream_reply = calls_tool
+    conversation.tools = [tool]
+    await wait_for_replies(conversation, events, 2)
+
+    assert voice.spoken == ["Let me look into that.", "Canberra is the capital.", "It was a compromise."]
+    assert first_spoken_at[0] < tool.sent_second_sentence_at
+    assert transcripts(events.since(0)[1], "assistant")[-1] == "Canberra is the capital. It was a compromise."

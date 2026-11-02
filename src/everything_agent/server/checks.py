@@ -7,8 +7,7 @@ from typing import Any
 
 import httpx
 
-from ..settings import Settings
-from ..tools import claude_code
+from ..settings import API_KEY, Settings
 from ..voice.voices import VOICES_URL, headers
 
 DAEMON_STATUS_URL = "http://127.0.0.1:8000/api/daemon/status"
@@ -79,12 +78,31 @@ def check_mic(live: dict[str, Any]) -> dict[str, str]:
 
 
 async def check_claude(settings: Settings) -> dict[str, str]:
-    if not settings.claude_code:
+    if not settings.claude:
         return _result("off", "Turned off; Reachy answers everything itself.")
-    found = await claude_code.version(settings.claude_code_command)
-    if not found:
-        return _result("warn", "Claude Code isn't installed, so Reachy answers hard questions itself.")
-    return _result("ok", f"Claude Code {found.split()[0]} is installed. If it isn't signed in yet, run claude once.")
+    key, token = settings.anthropic_api_key, settings.claude_setup_token
+    if not key and not token:
+        return _result("warn", "No Anthropic API key or Claude setup token yet, so Reachy answers hard questions itself.")
+    using_key = bool(key) and (settings.claude_auth == API_KEY or not token)
+    backup = ""
+    if key and token:
+        backup = " The setup token is the backup." if using_key else " The API key is the backup."
+    if not using_key:
+        return _result("ok", f"Using the Claude setup token ({settings.claude_model}).{backup}")
+    import anthropic
+
+    try:
+        async with anthropic.AsyncAnthropic(api_key=key, timeout=8.0, max_retries=0) as client:
+            await client.models.retrieve(settings.claude_model)
+    except anthropic.AuthenticationError:
+        return _result("fail", "Anthropic rejected the API key.")
+    except anthropic.NotFoundError:
+        return _result("fail", f"The API key can't use {settings.claude_model}.")
+    except anthropic.APIStatusError as exc:
+        return _result("warn", f"Couldn't confirm the Anthropic API key (HTTP {exc.status_code}).")
+    except anthropic.APIConnectionError:
+        return _result("warn", "Couldn't reach Anthropic.")
+    return _result("ok", f"Anthropic API key works ({settings.claude_model}).{backup}")
 
 
 async def run_checks(settings: Settings, live: dict[str, Any]) -> dict[str, dict[str, str]]:

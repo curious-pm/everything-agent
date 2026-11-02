@@ -196,7 +196,7 @@ const CHECK_LABELS: Record<string, string> = {
   llm: "Thinking (AI model)",
   robot: "Robot",
   mic: "Microphone",
-  claude: "Hard questions (Claude Code)",
+  claude: "Hard questions (Claude)",
 };
 
 function Advanced({ fields }: { fields: FieldsApi }) {
@@ -238,37 +238,15 @@ function Advanced({ fields }: { fields: FieldsApi }) {
       <h2 className="section-title">Advanced</h2>
       <form className="keys-form" onSubmit={submit}>
         <h3>Keys and AI model</h3>
-        {all && KEY_FIELDS.map((key) => {
-          const f = all[key];
-          if (!f) return null;
-          const secret = f.kind === "secret";
-          return (
-            <Row key={key} label={f.label} hint={secret && f.is_set ? `${f.hint} Leave blank to keep the saved one.` : f.hint}>
-              <input
-                className="field" type={secret ? "password" : "text"} autoComplete="off" aria-label={f.label}
-                value={draft[key] ?? (secret ? "" : f.value)}
-                placeholder={secret ? (f.is_set ? `${f.value} (saved)` : "Paste your key") : f.default}
-                onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
-              />
-            </Row>
-          );
-        })}
+        {all && KEY_FIELDS.map((key) => all[key] && (
+          <KeyInput key={key} field={all[key]} value={draft[key]} onChange={(v) => setDraft({ ...draft, [key]: v })} />
+        ))}
         <div className="form-actions">
           <button className="btn primary" type="submit" disabled={Object.keys(draft).length === 0}>Save keys</button>
         </div>
       </form>
 
-      {all?.CLAUDE_CODE_ENABLED && (
-        <SwitchRow
-          label={all.CLAUDE_CODE_ENABLED.label}
-          hint={all.CLAUDE_CODE_ENABLED.hint}
-          checked={fields.value("CLAUDE_CODE_ENABLED") !== "false"}
-          onChange={async (v) => {
-            await fields.save({ CLAUDE_CODE_ENABLED: v ? "true" : "false" });
-            recheckSoon();
-          }}
-        />
-      )}
+      <ClaudeKeys fields={fields} onSaved={recheckSoon} />
 
       <Row label="Check that everything works" hint={checking ? "Checking…" : undefined}>
         <button className="btn" onClick={runChecks} disabled={checking}>Check again</button>
@@ -308,6 +286,79 @@ function Advanced({ fields }: { fields: FieldsApi }) {
       )}
       {info && <p className="muted version">Everything Agent {info.version}</p>}
     </>
+  );
+}
+
+function KeyInput({ field, value, onChange }: { field: SettingField; value: string | undefined; onChange: (value: string) => void }) {
+  const secret = field.kind === "secret";
+  return (
+    <Row label={field.label} hint={secret && field.is_set ? `${field.hint} Leave blank to keep the saved one.` : field.hint}>
+      <input
+        className="field" type={secret ? "password" : "text"} autoComplete="off" aria-label={field.label}
+        value={value ?? (secret ? "" : field.value)}
+        placeholder={secret ? (field.is_set ? `${field.value} (saved)` : "Paste your key") : field.default}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </Row>
+  );
+}
+
+const CLAUDE_FIELDS = ["ANTHROPIC_API_KEY", "CLAUDE_CODE_OAUTH_TOKEN"];
+
+const CLAUDE_AUTH: [string, string][] = [
+  ["api_key", "API key"],
+  ["setup_token", "Setup token"],
+];
+
+function ClaudeKeys({ fields, onSaved }: { fields: FieldsApi; onSaved: () => void }) {
+  const [draft, setDraft] = useState<Record<string, string>>({});
+  const all = fields.fields;
+  if (!all?.CLAUDE_ENABLED) return null;
+  const enabled = fields.value("CLAUDE_ENABLED") !== "false";
+  const both = CLAUDE_FIELDS.every((key) => all[key]?.is_set);
+  const auth = fields.value("CLAUDE_AUTH") || "api_key";
+
+  const save = async (values: Record<string, string>, note?: string) => {
+    if (await fields.save(values, note)) onSaved();
+  };
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    await save(draft, "Saved. Reachy asks Claude with it from now on.");
+    setDraft({});
+  };
+
+  return (
+    <form className="keys-form" onSubmit={submit}>
+      <h3>Claude for hard questions</h3>
+      <SwitchRow
+        label={all.CLAUDE_ENABLED.label}
+        hint={all.CLAUDE_ENABLED.hint}
+        checked={enabled}
+        onChange={(v) => save({ CLAUDE_ENABLED: v ? "true" : "false" })}
+      />
+      {enabled && (
+        <>
+          {CLAUDE_FIELDS.map((key) => all[key] && (
+            <KeyInput key={key} field={all[key]} value={draft[key]} onChange={(v) => setDraft({ ...draft, [key]: v })} />
+          ))}
+          {both && all.CLAUDE_AUTH && (
+            <Row label={all.CLAUDE_AUTH.label} hint={all.CLAUDE_AUTH.hint}>
+              <span role="group" aria-label={all.CLAUDE_AUTH.label} className="row-control">
+                {CLAUDE_AUTH.map(([id, label]) => (
+                  <button
+                    key={id} type="button" className={auth === id ? "btn primary" : "btn"} aria-pressed={auth === id}
+                    onClick={() => auth !== id && save({ CLAUDE_AUTH: id })}
+                  >{label}</button>
+                ))}
+              </span>
+            </Row>
+          )}
+          <div className="form-actions">
+            <button className="btn primary" type="submit" disabled={Object.values(draft).every((v) => !v.trim())}>Save Claude keys</button>
+          </div>
+        </>
+      )}
+    </form>
   );
 }
 

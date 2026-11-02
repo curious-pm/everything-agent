@@ -21,6 +21,9 @@ DEFAULT_LLM_BASE_URL = "https://openrouter.ai/api/v1"
 DEFAULT_LLM_MODEL = "google/gemini-2.5-flash"
 DEFAULT_VOICE_ID = "a0e99841-438c-4a64-b679-ae501e7d6091"
 DEFAULT_WEB_PORT = 8042
+DEFAULT_CLAUDE_MODEL = "claude-haiku-5-5"
+API_KEY = "api_key"
+SETUP_TOKEN = "setup_token"
 
 AUTO_LANGUAGE = "auto"
 LANGUAGES = {"en": "English", "hi": "Hindi", "fr": "French", "es": "Spanish", "ja": "Japanese"}
@@ -71,9 +74,15 @@ FIELDS: tuple[Field, ...] = (
           "How loud speech must be before Reachy listens. Higher suits a noisy room.", "0.03"),
     Field("BARGE_IN_ENABLED", "Stop talking when I interrupt", "bool",
           "Works best in a quiet room; Reachy can mistake its own voice for yours.", "false"),
-    Field("CLAUDE_CODE_ENABLED", "Ask Claude for hard questions", "bool",
-          "Reachy hands questions that need the web or careful thinking to Claude Code "
-          "on this computer. Install Claude Code and sign in once by running claude.", "true"),
+    Field("CLAUDE_ENABLED", "Ask Claude for hard questions", "bool",
+          "Reachy hands questions that need the web or careful thinking to Claude. "
+          "Add an Anthropic API key or a Claude setup token.", "true"),
+    Field("ANTHROPIC_API_KEY", "Anthropic API key", "secret",
+          "Fastest. Paid per question; get one at platform.claude.com."),
+    Field("CLAUDE_CODE_OAUTH_TOKEN", "Claude setup token", "secret",
+          "Uses your Claude plan. On any computer with Claude Code, run claude setup-token and paste what it prints."),
+    Field("CLAUDE_AUTH", "Ask Claude with", "choice",
+          "If it fails, Reachy tries the other one.", API_KEY),
 )
 FIELDS_BY_KEY = {f.key: f for f in FIELDS}
 
@@ -130,10 +139,12 @@ class Settings:
     stt_idle_timeout_s: float = 60.0
     barge_in: bool = False
     barge_in_threshold: float = 0.12
-    claude_code: bool = True
-    claude_code_command: str = "claude"
-    claude_code_timeout_s: float = 180.0
-    claude_code_folders: tuple[str, ...] = ()
+    claude: bool = True
+    anthropic_api_key: str = field(default="", repr=False)
+    claude_setup_token: str = field(default="", repr=False)
+    claude_auth: str = API_KEY
+    claude_model: str = DEFAULT_CLAUDE_MODEL
+    claude_timeout_s: float = 60.0
     web_host: str = "0.0.0.0"
     web_port: int = DEFAULT_WEB_PORT
     web_pin: str = ""
@@ -207,12 +218,12 @@ class Settings:
             stt_idle_timeout_s=_number(values, "STT_IDLE_TIMEOUT_S", 60.0),
             barge_in=_bool(values.get("BARGE_IN_ENABLED"), False),
             barge_in_threshold=_number(values, "BARGE_IN_THRESHOLD", 0.12),
-            claude_code=_bool(values.get("CLAUDE_CODE_ENABLED"), True),
-            claude_code_command=get("CLAUDE_CODE_COMMAND", "claude"),
-            claude_code_timeout_s=_number(values, "CLAUDE_CODE_TIMEOUT_S", 180.0),
-            claude_code_folders=tuple(
-                str(Path(f.strip()).expanduser()) for f in get("CLAUDE_CODE_FOLDERS").split(",") if f.strip()
-            ),
+            claude=_bool(values.get("CLAUDE_ENABLED"), True),
+            anthropic_api_key=get("ANTHROPIC_API_KEY"),
+            claude_setup_token=get("CLAUDE_CODE_OAUTH_TOKEN"),
+            claude_auth=SETUP_TOKEN if get("CLAUDE_AUTH").lower() == SETUP_TOKEN else API_KEY,
+            claude_model=get("CLAUDE_MODEL", DEFAULT_CLAUDE_MODEL),
+            claude_timeout_s=_number(values, "CLAUDE_TIMEOUT_S", 60.0),
             web_host=get("WEB_HOST", default_host),
             web_port=_number(values, "WEB_PORT", DEFAULT_WEB_PORT, int),
             web_pin=pin,

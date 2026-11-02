@@ -15,6 +15,9 @@ NOT_SHIPPED = {
     "pefile", "pywin32-ctypes", "macholib", "pytest", "pytest-asyncio", "pluggy", "iniconfig",
     "gstreamer-plugins-gpl", "gstreamer-plugins-gpl-restricted", "gstreamer-plugins-restricted",
 }
+CLAUDE_CODE = """claude-agent-sdk bundles the Claude Code command-line program (claude_agent_sdk/_bundled),
+Copyright Anthropic, PBC. It is used under Anthropic's Commercial Terms of Service:
+https://www.anthropic.com/legal/commercial-terms"""
 GSTREAMER = """GStreamer and its plugins are licensed under the GNU Lesser General Public License 2.1
 (full text below). The app loads them as separate libraries, which you may replace with your
 own builds. Source code: https://gstreamer.freedesktop.org/src/ (the version is in the
@@ -105,7 +108,7 @@ def render(components) -> str:
             lines.append(f"{name} {version}: {license_name}" + (f" [{', '.join(refs)}]" if refs else ""))
         lines.append("")
     lgpl = (ROOT / "packaging" / "licenses" / "LGPL-2.1.txt").read_text(encoding="utf-8").strip()
-    lines += ["== GStreamer ==", "", GSTREAMER, "", "== License texts ==", ""]
+    lines += ["== Claude Code ==", "", CLAUDE_CODE, "", "== GStreamer ==", "", GSTREAMER, "", "== License texts ==", ""]
     for number, body in enumerate(texts.values(), 1):
         lines += [f"---- [{number}] ----", body, ""]
     lines += ["---- GNU Lesser General Public License 2.1 ----", lgpl, ""]

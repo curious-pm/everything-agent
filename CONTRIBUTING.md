@@ -56,16 +56,19 @@ Things that aren't obvious from the code, and cost time to find out.
 - Ollama uses its native `/api/chat`, because its OpenAI-compatible API can't turn thinking off.
 - OpenRouter lists its models to anyone, so the key check uses `/key`, not `/models`.
 
-### Claude Code tool
+### Claude tool
 
-- It uses Claude Code's own login on the machine; the app stores no Anthropic key.
-- It runs `claude -p --restricted` in an empty folder, with only look-up and read tools, and
-  file access limited to the folders in `CLAUDE_CODE_FOLDERS`. Read, Grep and Glob are also
-  denied on credential files, and the app's keys and token are removed from its environment.
-- The question goes in on stdin, never on the command line: on Windows an npm install of
-  Claude Code is a `.cmd` file, which cmd.exe would parse.
-- It runs at low priority so it can't make Reachy's voice stutter, and the whole process
-  tree is killed on timeout, since Claude starts helpers that outlive a plain kill.
+- An Anthropic API key goes straight to the Messages API with the basic `web_search` tool;
+  dynamic filtering would add a code-execution step and more delay.
+- A setup token can't call the Messages API, so it runs Claude Code's agent through
+  `claude-agent-sdk`, whose wheel bundles the Claude Code binary. The agent is started when the
+  conversation starts and warmed with one tiny question: starting it takes a few seconds and
+  its first answer is slower.
+- Each question gets a fresh agent session, so earlier questions don't slow later ones.
+- The agent gets only `WebSearch`, no settings files or MCP servers, and an environment with
+  this app's keys blanked. `ANTHROPIC_API_KEY` is blanked too, or it would win over the token.
+- The answer streams into `Conversation.announce_stream`, which waits for the first words
+  before taking the turn, so the user can keep talking while Claude works.
 
 ### Robot and audio
 

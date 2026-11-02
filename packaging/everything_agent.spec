@@ -27,7 +27,7 @@ datas = collect_data_files("everything_agent", excludes=["web/robot/**"])
 binaries = []
 hiddenimports = collect_submodules("everything_agent") + collect_submodules("reachy_mini.daemon") + GI_STDLIB_DEPENDENCIES
 
-for package in ("reachy_mini", "tzdata"):
+for package in ("reachy_mini", "tzdata", "anthropic", "claude_agent_sdk"):
     if importlib.util.find_spec(package):
         d, b, h = collect_all(package)
         datas += d

@@ -21,6 +21,8 @@ dependencies = [
     "uvicorn",
     "psutil>=5.9",
     "tzdata",
+    "anthropic>=2.3",
+    "claude-agent-sdk>=0.2.176",
 ]
 keywords = ["reachy-mini-app", "reachy_mini", "voice", "conversation"]
 classifiers = [

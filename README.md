@@ -40,9 +40,9 @@ Two API keys, entered on the setup screen the first time you open the app:
 
 Keys stay on the device the app runs on.
 
-Optional: [Claude Code](https://claude.com/claude-code), installed and signed in on the same
-machine (run `claude` once; on the robot, `claude setup-token`). Reachy then hands hard
-questions to it, see [Hard questions go to Claude](#hard-questions-go-to-claude).
+Optional: an [Anthropic API key](https://platform.claude.com/settings/keys) or a Claude setup
+token (run `claude setup-token` on any computer with Claude Code). Reachy then hands hard
+questions to Claude, see [Hard questions go to Claude](#hard-questions-go-to-claude).
 
 ## Install
 
@@ -114,20 +114,30 @@ Settings → Advanced. Every reply's timing is in the log as a `Timing:` line.
 ### Hard questions go to Claude
 
 The model is offered tools (`src/everything_agent/tools/`). The first is `ask_claude`: when a
-question needs the web or careful thinking, the model hands it to Claude Code (`claude -p`)
-running in the background and says it's looking into it. Claude's answer is spoken as soon as
-it's ready, usually 10 to 30 seconds later; the conversation carries on meanwhile.
+question needs the web or careful thinking, the model hands it to Claude (Claude Haiku 5.5 by
+default, `CLAUDE_MODEL`) and says it's looking into it. Claude's answer is spoken sentence by
+sentence as it arrives, and the conversation carries on meanwhile. Claude can only search the
+web: it can't read files or run anything, and it never sees this app's other keys.
 
-Claude runs in Claude Code's restricted mode: it may search the web, fetch pages and read
-files, but never edit or run anything, and it ignores your own Claude Code settings and MCP
-servers. It reads files only in the folders you list in `CLAUDE_CODE_FOLDERS` (none by default),
-never credential files, and it can't see this app's keys. It's on whenever Claude Code is
-installed; switch it off under Settings → Advanced. It uses your own Claude Code sign-in, so
-its questions count toward your own Claude plan or API usage.
+Add one or both under Settings → Advanced → Claude for hard questions:
+
+| | Anthropic API key | Claude setup token |
+|---|---|---|
+| Get it | [platform.claude.com](https://platform.claude.com/settings/keys) | `claude setup-token` on any computer with Claude Code |
+| Paid by | Per question, on your API account | Your Claude plan |
+| How it runs | Claude API, called directly | Claude Code's agent through the [Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview), kept running between questions |
+| Answer starts (no web) | under a second | about a second |
+| Answer starts (web search) | a few seconds | 8 to 10 seconds |
+
+With both saved, a switch picks which one Reachy uses; if it fails before saying anything (a
+rejected key, a usage limit), Reachy tries the other. Anthropic doesn't allow third-party
+products to offer Claude plan sign-in unless it has approved them (see the Agent SDK
+overview's note), so the setup token is for your own use on your own robot; prefer the API key
+for anything you hand to others.
 
 New tools subclass `Tool` and are listed in `tools.available()`. A tool either returns a
 result the model then answers with, or (like `ask_claude`) works in the background and speaks
-through `announce`.
+through `announce` or, sentence by sentence, `announce_stream`.
 
 ### Project layout
 
@@ -180,9 +190,8 @@ Delete the `WEB_PIN_HASH` line and restart; the next visit sets a new one.
 - On the robot, the first visitor chooses the PIN, so open the page yourself right after
   installing. In the desktop app only its own window can set the first PIN.
 - The page is plain HTTP on your local network: use it on networks you trust.
-- Anyone who can talk to Reachy can ask Claude things. Claude can't change anything on the
-  computer, but it can read the folders you share with it and fetch web pages, so share only
-  folders you're happy for anyone in the room to ask about.
+- Anyone who can talk to Reachy can ask Claude things, on your API account or Claude plan.
+  Claude can only search the web; it can't read files or change anything on the computer.
 - Report security problems privately to the maintainers rather than in a public issue.
 
 ## License

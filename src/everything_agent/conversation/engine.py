@@ -132,7 +132,7 @@ class Conversation:
         self.providers = providers or cloud_providers(settings)
         self.history = history or History(settings.system_prompt)
         self.tools = available(settings) if tools is None else tools
-        self._tool_context = ToolContext(announce=self.announce, spawn=self._spawn)
+        self._tool_context = ToolContext(announce=self.announce, announce_stream=self.announce_stream, spawn=self._spawn)
         self.speaker = Speaker(robot.out, settings.prebuffer_ms / 1000.0)
         self._barge = BargeInDetector(settings.barge_in_threshold)
         self._resampler = Resampler(tts_module.SAMPLE_RATE, robot.out.sample_rate)
@@ -161,6 +161,8 @@ class Conversation:
 
     async def run(self, stop: asyncio.Event) -> None:
         await asyncio.gather(self.providers.voice.prewarm(), self.providers.warm_up())
+        for tool in self.tools:
+            self._spawn(tool.warm_up())
         tasks = [asyncio.create_task(self._listen(), name="listen"), asyncio.create_task(self._watch_idle(), name="idle")]
         stopper = asyncio.create_task(stop.wait())
         try:
@@ -177,6 +179,8 @@ class Conversation:
             await self.speaker.finish(interrupt=True)
             await self._drop_stt()
             await self.providers.voice.close()
+            for tool in self.tools:
+                await tool.close()
 
     def status(self) -> dict[str, Any]:
         now = time.monotonic()
@@ -234,7 +238,26 @@ class Conversation:
 
     def announce(self, text: str) -> None:
         """Say something unprompted, once any reply in progress is over."""
-        self._spawn(self._say_aloud(text))
+
+        async def once() -> AsyncIterator[str]:
+            yield text
+
+        self.announce_stream(once())
+
+    def announce_stream(self, chunks: AsyncIterator[str]) -> None:
+        """Like announce, but speaks each sentence as soon as it has arrived."""
+        queue: asyncio.Queue[str | None] = asyncio.Queue()
+
+        async def pump() -> None:
+            try:
+                async for chunk in chunks:
+                    if chunk:
+                        queue.put_nowait(chunk)
+            finally:
+                queue.put_nowait(None)
+
+        self._spawn(pump())
+        self._spawn(self._say_aloud(queue))
 
     def set_voice(self, voice_id: str) -> None:
         self.providers.voice.voice_id = voice_id
@@ -376,24 +399,41 @@ class Conversation:
             logger.exception("%s failed", call.name)
             return tool, f"That didn't work: {exc}"
 
-    async def _say_aloud(self, text: str) -> None:
+    async def _say_aloud(self, chunks: asyncio.Queue[str | None]) -> None:
+        first = await chunks.get()
+        if first is None:
+            return
+        said = [first]
         async with self._turn_lock:
-            if not self.asleep:
+            if self.asleep:
+                while (chunk := await chunks.get()) is not None:
+                    said.append(chunk)
+            else:
                 self._begin_playback()
                 sentences: asyncio.Queue[str | None] = asyncio.Queue()
+                voice_task = asyncio.create_task(self._speak(sentences, {}))
                 splitter = SentenceSplitter()
-                for sentence in [*splitter.feed(text), splitter.flush()]:
-                    if sentence:
-                        sentences.put_nowait(sentence)
-                sentences.put_nowait(None)
                 try:
-                    await self._speak(sentences, {})
+                    chunk: str | None = first
+                    while chunk is not None and not self._barge_in:
+                        for sentence in splitter.feed(chunk):
+                            sentences.put_nowait(sentence)
+                        chunk = await chunks.get()
+                        if chunk is not None:
+                            said.append(chunk)
+                    tail = splitter.flush()
+                    if tail and not self._barge_in:
+                        sentences.put_nowait(tail)
+                    sentences.put_nowait(None)
+                    await voice_task
                     await self._end_playback()
                 finally:
+                    voice_task.cancel()
                     self._gated = False
                     if self.speaker.playing:
                         await self.speaker.finish(interrupt=True)
-            self._record_reply(text, speakable(text) or text)
+        text = "".join(said).strip()
+        self._record_reply(text, speakable(text) or text)
 
     def _begin_playback(self) -> None:
         self._gated = True

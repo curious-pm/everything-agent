@@ -7,7 +7,8 @@ The desktop installers also contain third-party software under their own license
 THIRD_PARTY_LICENSES.txt, installed with the app. Among them is GStreamer, licensed under the GNU
 Lesser General Public License 2.1; its source code is available from
 https://gstreamer.freedesktop.org/src/ and the exact builds used come from the gstreamer-*
-packages on PyPI.
+packages on PyPI. They also contain the Claude Code program that ships inside the
+claude-agent-sdk package, Copyright Anthropic, PBC, used under Anthropic's Commercial Terms.
 
 Everything Agent is an independent project. It is not affiliated with or endorsed by Pollen
 Robotics, Hugging Face or Anthropic. Reachy is a trademark of Pollen Robotics;

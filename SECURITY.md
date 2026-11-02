@@ -18,8 +18,8 @@ Only the latest release gets security fixes.
 
 - The web page and its API: sign-in, the PIN, settings, and anything reachable without signing in.
 - The desktop app: the shell, its local API token, and the packaged core.
-- The Claude Code tool: anything that lets a spoken or typed question read files, run commands
-  or reach data outside the folders listed in `CLAUDE_CODE_FOLDERS`.
+- The Claude tool: anything that lets a spoken or typed question read files, run commands or
+  reach this app's keys.
 - Where the app stores keys and settings, and who else on the computer can read them.
 
 Problems in Reachy Mini's own software, Claude Code, or the speech and model providers belong

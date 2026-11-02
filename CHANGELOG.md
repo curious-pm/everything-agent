@@ -6,6 +6,17 @@ All notable changes to Everything Agent are listed here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Hard questions go to Claude with an Anthropic API key or a Claude setup token, set in
+  Settings → Advanced, instead of a Claude Code install on the same computer. Works on the
+  robot, and the answer is spoken as it arrives.
+
+### Removed
+
+- `CLAUDE_CODE_ENABLED`, `CLAUDE_CODE_COMMAND`, `CLAUDE_CODE_TIMEOUT_S` and
+  `CLAUDE_CODE_FOLDERS`; Claude no longer reads local folders.
+
 ## [0.1.0]
 
 First public release.
