@@ -1,0 +1,56 @@
+:root {
+  color-scheme: light;
+  --shell: #f4f5f3;
+  --surface: #ffffff;
+  --ink: #1d2127;
+  --ink-soft: #3a4049;
+  --muted: #5c636e;
+  --line: #e1e3e2;
+  --chip: #e8eae9;
+  --robot-shell: #ffffff;
+  --robot-body: #e2e4e3;
+  --robot-edge: #e1e3e2;
+  --listen: #3f7bff;
+  --think: #e9a23b;
+  --speak: #f0643c;
+  --state: var(--listen);
+  --sans: "Recursive Variable", "Segoe UI", system-ui, sans-serif;
+  --gutter: clamp(16px, 4vw, 40px);
+  --measure: 66ch;
+  --radius-s: 10px;
+  --radius-l: 22px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --shell: #15181c;
+  --surface: #1d2127;
+  --ink: #eef0ef;
+  --ink-soft: #c9cdd2;
+  --muted: #a3a9b2;
+  --line: #2c3139;
+  --chip: #262b32;
+  --robot-shell: #e9ebea;
+  --robot-body: #c9cccb;
+  --robot-edge: #c9cccb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --shell: #15181c;
+    --surface: #1d2127;
+    --ink: #eef0ef;
+    --ink-soft: #c9cdd2;
+    --muted: #a3a9b2;
+    --line: #2c3139;
+    --chip: #262b32;
+    --robot-shell: #e9ebea;
+    --robot-body: #c9cccb;
+    --robot-edge: #c9cccb;
+  }
+}
+
+[data-phase="listening"] { --state: var(--listen); }
+[data-phase="thinking"] { --state: var(--think); }
+[data-phase="speaking"] { --state: var(--speak); }

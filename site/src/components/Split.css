@@ -1,0 +1,55 @@
+.split > div {
+  margin-top: 28px;
+  max-width: var(--measure);
+}
+
+.private ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 18px;
+}
+
+.private li {
+  color: var(--ink-soft);
+  padding-left: 22px;
+  position: relative;
+}
+
+.private li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+}
+
+.private li strong {
+  color: var(--ink);
+}
+
+.private .claim {
+  margin-top: 24px;
+  font-weight: 600;
+}
+
+.open p {
+  color: var(--ink-soft);
+}
+
+@media (min-width: 1000px) {
+  main > .split {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    column-gap: clamp(40px, 6vw, 96px);
+    align-items: start;
+  }
+
+  .split > div {
+    margin-top: 6px;
+  }
+}

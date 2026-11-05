@@ -1,0 +1,44 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px var(--gutter);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.mark-eye {
+  fill: var(--listen);
+}
+
+.bar nav {
+  display: flex;
+  gap: clamp(14px, 3vw, 28px);
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.bar nav a {
+  text-decoration: none;
+}
+
+.bar nav a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .bar nav a:not(:last-child) {
+    display: none;
+  }
+}

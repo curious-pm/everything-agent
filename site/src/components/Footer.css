@@ -1,0 +1,14 @@
+.foot {
+  max-width: 1200px;
+  margin: clamp(72px, 10vw, 128px) auto 0;
+  padding: 28px var(--gutter) 40px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--muted);
+  display: grid;
+  gap: 8px;
+}
+
+.foot p {
+  max-width: 90ch;
+}

@@ -1,0 +1,43 @@
+.exchanges {
+  margin: 40px 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(28px, 5vw, 72px);
+  row-gap: 48px;
+}
+
+.exchanges dt {
+  font-weight: 750;
+  font-size: 20px;
+}
+
+.exchanges dd {
+  margin: 14px 0 0;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.exchanges .you {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.exchanges .reachy {
+  font-size: 22px;
+  line-height: 1.35;
+  padding-left: 16px;
+  border-left: 3px solid var(--speak);
+  max-width: 30ch;
+}
+
+.exchanges .more {
+  color: var(--ink-soft);
+  max-width: 44ch;
+}
+
+@media (max-width: 720px) {
+  .exchanges {
+    grid-template-columns: 1fr;
+  }
+}
