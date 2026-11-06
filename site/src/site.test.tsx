@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { conversation } from "./content";
@@ -31,7 +31,7 @@ describe("the hero conversation", () => {
     const stage = screen.getByRole("figure", { name: /sample conversation/i });
     expect(stage).toHaveAttribute("data-phase", "speaking");
     expect(stage).toHaveTextContent("¡Claro! Puedo charlar contigo");
-    expect(screen.queryByRole("button", { name: "Play again" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Talk over Reachy" })).not.toBeInTheDocument();
   });
 
   it("plays through listening, thinking, a cut-off reply and the Spanish answer", async () => {
@@ -53,7 +53,46 @@ describe("the hero conversation", () => {
     expect([...seen]).toEqual(expect.arrayContaining(["listening", "thinking", "speaking"]));
     expect(cutSeen).toBe(true);
     expect(reply()).toHaveTextContent("buscar cosas por ti.");
-    expect(screen.getByRole("button", { name: "Play again" })).toBeInTheDocument();
+    expect(within(stage).getByRole("button", { name: "Tell me a fun fact" })).toBeEnabled();
+  });
+
+  it("answers a question chip, and stops when you talk over it", async () => {
+    setReducedMotion(false);
+    vi.useFakeTimers();
+    render(<App />);
+    const stage = screen.getByRole("figure", { name: /sample conversation/i });
+    const advance = async (ms: number) => {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(ms);
+      });
+    };
+    await advance(20000);
+    fireEvent.click(within(stage).getByRole("button", { name: "Tell me a fun fact" }));
+    await advance(700);
+    expect(stage).toHaveTextContent("You said: “Tell me a fun fact”");
+    await advance(1300 + 150 * 4);
+    expect(stage).toHaveAttribute("data-phase", "speaking");
+    expect(within(stage).queryByRole("button", { name: "Tell me a fun fact" })).not.toBeInTheDocument();
+
+    fireEvent.click(within(stage).getByRole("button", { name: "Talk over Reachy" }));
+    expect(stage.querySelector(".reply")).toHaveClass("ducking");
+    await advance(500);
+    expect(stage).toHaveAttribute("data-phase", "listening");
+    expect(stage).toHaveTextContent("You talked over Reachy, so it stopped to listen.");
+    expect(stage.querySelector(".reply")!.textContent).toMatch(/^Octopuses have three.*…$/);
+    expect(within(stage).getByRole("button", { name: "What can you do?" })).toBeEnabled();
+  });
+});
+
+describe("the app tour", () => {
+  it("switches between the real screenshots", () => {
+    setReducedMotion(true);
+    render(<App />);
+    const settings = screen.getByRole("button", { name: "Settings" });
+    fireEvent.click(settings);
+    expect(settings).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByAltText(/language, voice and Reachy's personality/)).toHaveClass("shown");
+    expect(screen.getByText(/Pick a voice/)).toBeInTheDocument();
   });
 });
 
@@ -131,8 +170,9 @@ describe("download button", () => {
     render(<App />);
     fireEvent.click(screen.getByRole("tab", { name: "Windows and macOS" }));
     const pane = within(screen.getByRole("tabpanel"));
-    const windows = await pane.findByRole("link", { name: /^Download for Windows/ });
-    expect(windows).toHaveAttribute("href", "https://example.com/a.exe");
+    await waitFor(() =>
+      expect(pane.getByRole("link", { name: /^Download for Windows/ })).toHaveAttribute("href", "https://example.com/a.exe"),
+    );
     expect(pane.getByRole("link", { name: /Download for macOS \(Apple silicon\)/ })).toHaveAttribute("href", "https://example.com/a.dmg");
     expect(screen.queryByText(/isn't published yet/)).not.toBeInTheDocument();
   });

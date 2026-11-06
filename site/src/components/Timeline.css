@@ -19,7 +19,14 @@
 
 .timeline li {
   padding-top: 18px;
-  border-top: 3px solid var(--state);
+  border-top: 3px solid var(--line);
+  opacity: 0.55;
+  transition: opacity 300ms ease, border-color 300ms ease;
+}
+
+.timeline li.reached {
+  border-top-color: var(--state);
+  opacity: 1;
 }
 
 .when {
@@ -36,22 +43,44 @@
   max-width: 34ch;
 }
 
-.bar-chart {
+.track {
   display: flex;
-  height: 10px;
+  align-items: center;
+  gap: 16px;
   margin-top: 40px;
-  border-radius: 999px;
-  overflow: hidden;
-  max-width: 720px;
+  max-width: 800px;
+}
+
+.bar-chart {
+  flex: 1;
+  display: flex;
+  gap: 3px;
+  height: 10px;
 }
 
 .seg {
-  background: var(--state);
+  position: relative;
+  flex-basis: 0;
+  border-radius: 999px;
+  background: var(--chip);
+  overflow: hidden;
 }
 
-.seg[data-phase="listening"] { flex: 0.55; }
-.seg[data-phase="thinking"] { flex: 1.7; }
-.seg[data-phase="speaking"] { flex: 0.5; }
+.seg .fill {
+  position: absolute;
+  inset: 0;
+  background: var(--state);
+  transform-origin: left center;
+}
+
+.clock {
+  flex: none;
+  min-width: 4.5ch;
+  font-variation-settings: "MONO" 1;
+  font-size: 15px;
+  color: var(--ink);
+  text-align: right;
+}
 
 .how .note {
   margin-top: 16px;

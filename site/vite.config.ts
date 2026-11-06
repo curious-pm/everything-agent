@@ -9,6 +9,7 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
     cssCodeSplit: false,
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       output: {
         entryFileNames: "site.js",

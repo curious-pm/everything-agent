@@ -1,0 +1,25 @@
+.robot3d {
+  position: relative;
+  width: min(100%, 420px);
+  aspect-ratio: 1.15;
+  display: grid;
+  place-items: center;
+}
+
+.robot3d .robot {
+  width: 82%;
+}
+
+.robot3d canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 500ms ease;
+  touch-action: pan-y;
+}
+
+.robot3d.ready canvas {
+  opacity: 1;
+}

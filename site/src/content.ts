@@ -21,6 +21,34 @@ export const conversation: Beat[] = [
   { kind: "rest", pause: 600 },
 ];
 
+export type Question = { ask: string; reply: string; think: number };
+
+export const questions: Question[] = [
+  {
+    ask: "What can you do?",
+    reply: "I can chat with you, answer your questions, and look things up when something needs the web.",
+    think: 1100,
+  },
+  {
+    ask: "¿Hablas español?",
+    reply: "¡Claro! Puedo hablar contigo en español, o en el idioma que prefieras.",
+    think: 1000,
+  },
+  {
+    ask: "Tell me a fun fact",
+    reply: "Octopuses have three hearts. Two pump blood through the gills, and one sends it round the rest of the body.",
+    think: 1300,
+  },
+];
+
+export function beatsFor(question: Question): Beat[] {
+  return [
+    { kind: "hear", text: question.ask, pause: 700 },
+    { kind: "think", pause: question.think },
+    { kind: "say", text: question.reply },
+  ];
+}
+
 export const conversationSummary =
   "You: Hey Reachy, what can you do? Reachy starts answering; you cut in to ask for Spanish, " +
   "and Reachy stops and replies: ¡Claro! Puedo charlar contigo, responder tus preguntas y buscar cosas por ti.";
