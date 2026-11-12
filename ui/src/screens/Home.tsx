@@ -37,7 +37,7 @@ export function Home() {
   };
 
   return (
-    <main className="home">
+    <main className={`home${drawer ? " with-drawer" : ""}`}>
       <div className="home-top">
         <span className="muted" />
         <div className="home-actions">
