@@ -13,68 +13,46 @@ tags:
 
 # Everything Agent
 
-Talk with your [Reachy Mini](https://www.pollen-robotics.com/reachy-mini/) the way you'd talk
-with a person: no wake word, no button. It listens, answers out loud, moves its head while it
-speaks, and stops when you talk over it.
+Hands-free voice conversation for [Reachy Mini](https://www.pollen-robotics.com/reachy-mini/).
+No wake word, no button: talk, and Reachy answers out loud, moving its head as it speaks.
 
-![Everything Agent's home screen: the robot in 3D, with the conversation open beside it](docs/screenshot-home.png)
+![Everything Agent home screen](docs/screenshot-home.png)
 
-The same app runs in three places:
+It runs on the robot, as a desktop app on Windows and macOS (with or without a robot), and in
+any browser on the same network.
 
-- **On the robot** (Reachy Mini Wireless, on its Raspberry Pi), started from the robot's dashboard.
-- **On a laptop** (Windows or macOS) as a desktop app, with the robot plugged in over USB, or
-  without a robot at all, using the laptop's microphone and speaker.
-- **In any browser** on your network, for the robot or the laptop: the same screens as the desktop app.
+## Requirements
 
-This is the first step of a bigger assistant. It does one thing, conversation, and does it
-well; tools and integrations are meant to be added on top, one at a time.
+- A [Cartesia](https://play.cartesia.ai/keys) API key, for speech to text and the voice.
+- An [OpenRouter](https://openrouter.ai/keys) API key, or any OpenAI-compatible provider, or a
+  local [Ollama](https://ollama.com).
+- Optional: an [Anthropic API key](https://platform.claude.com/settings/keys) or a Claude setup
+  token (`claude setup-token`), so Reachy can pass hard questions to Claude.
 
-## What you need
-
-Two API keys, entered on the setup screen the first time you open the app:
-
-| What for | Service | Get a key |
-| --- | --- | --- |
-| Hearing and speaking | [Cartesia](https://cartesia.ai) (speech to text and voices) | [play.cartesia.ai/keys](https://play.cartesia.ai/keys) |
-| Thinking | [OpenRouter](https://openrouter.ai), or any OpenAI-compatible provider, or a local [Ollama](https://ollama.com) | [openrouter.ai/keys](https://openrouter.ai/keys) |
-
-Keys stay on the device the app runs on.
-
-Optional: an [Anthropic API key](https://platform.claude.com/settings/keys) or a Claude setup
-token (run `claude setup-token` on any computer with Claude Code). Reachy then hands hard
-questions to Claude, see [Hard questions go to Claude](#hard-questions-go-to-claude).
+You enter the keys on the setup screen the first time you open the app. They stay on the device.
 
 ## Install
 
-### On the robot (Reachy Mini Wireless)
-
-Install it into the robot's apps from a terminal on the robot (the dashboard's app store
-lists it once it's published there):
+**On the robot (Reachy Mini Wireless)**
 
 ```bash
 pip install git+https://github.com/curious-pm/Everything-Agent
 ```
 
-Start it from the dashboard, then open `http://reachy-mini.local:8042` on your phone or
-laptop. The first visit asks you to choose a PIN, then for the two keys. On the robot, Reachy
-uses its own microphone (with hardware echo cancelling) and speaker.
+Start the app from the robot's dashboard and open <http://reachy-mini.local:8042>. The first
+visit asks you to set a PIN, then for your keys.
 
-### Desktop app (Windows, macOS)
+**Desktop (Windows, macOS)**
 
-Download the installer from the [Releases](../../releases) page: the `.exe` for Windows, the
-`.dmg` for macOS. It starts the robot software for you: with Reachy plugged in over USB it uses
-the robot, and without it, your computer's microphone and speaker.
+Download the installer from [Releases](../../releases). The installers aren't code-signed yet:
+on Windows choose **More info → Run anyway**, on macOS right-click the app and choose **Open**.
 
-The installers aren't code-signed yet. On Windows, if SmartScreen says "Windows protected your
-PC", choose **More info → Run anyway**; on macOS, right-click the app and choose **Open** the
-first time.
-
-### From source, on a laptop
+**From source**
 
 ```bash
 git clone https://github.com/curious-pm/Everything-Agent && cd Everything-Agent
-uv sync                                        # or: python -m venv .venv && pip install -e .
-uv run reachy-mini-daemon --mockup-sim         # in another terminal; plain `reachy-mini-daemon` with the robot
+uv sync
+uv run reachy-mini-daemon --mockup-sim   # in a second terminal; drop --mockup-sim with a robot
 uv run python -m everything_agent
 ```
 
@@ -83,120 +61,54 @@ Then open <http://127.0.0.1:8042>.
 ## How it works
 
 ```
- microphone ─▶ loudness check ─▶ Cartesia speech-to-text (streaming)
-                                        │  you stopped talking (550 ms of silence,
-                                        ▼  longer after "and", "um", a trailing comma)
-                              language model (streaming)
-                                        │  each finished sentence
-                                        ▼
-                              Cartesia voice (streaming) ─▶ speaker + head wobble
+microphone → speech to text → language model → voice → speaker + head motion
 ```
 
-Everything streams, which is what keeps it fast:
+Each stage streams into the next, so Reachy starts speaking after the first sentence of the
+reply. A reply usually starts 2.5 to 3 seconds after you stop talking, most of it the model's
+response time; a faster provider can be set under **Settings → Advanced**.
 
-- **Speech to text only runs while someone talks.** A local loudness check opens the
-  connection on the first word, and the audio from just before is kept, so nothing is
-  clipped. After a minute of quiet it closes, so an idle robot costs nothing.
-- **Reachy starts speaking after the first sentence**, not the whole reply.
-- **Connections stay warm.** The model's connection is kept open between turns and refreshed
-  while you talk; the voice socket stays open for the whole conversation.
-- **Turn-taking is forgiving.** If you pause and carry on before Reachy has started
-  answering, it drops that answer and replies to everything you said together.
-- **Talking over Reachy** (if switched on) first turns its voice down, then stops it if
-  you keep talking. Its own voice fades with it; yours doesn't.
+Questions that need the web or careful reasoning are handed to Claude through the `ask_claude`
+tool. Claude can only search the web; it can't read files or run commands.
 
-Reachy starts speaking about one second, plus the model's own response time, after your last
-word. The model is the biggest part: Gemini 2.5 Flash through OpenRouter takes 1.3 to 2
-seconds to start answering, so replies begin 2.5 to 3 seconds after you stop. A provider
-close to you (for example Groq, or Gemini's own endpoint) cuts that; set it under
-Settings → Advanced. Every reply's timing is in the log as a `Timing:` line.
+## Configuration
 
-### Hard questions go to Claude
+All settings are stored in a single `.env` file:
 
-The model is offered tools (`src/everything_agent/tools/`). The first is `ask_claude`: when a
-question needs the web or careful thinking, the model hands it to Claude (Claude Haiku 5.5 by
-default, `CLAUDE_MODEL`) and says it's looking into it. Claude's answer is spoken sentence by
-sentence as it arrives, and the conversation carries on meanwhile. Claude can only search the
-web: it can't read files or run anything, and it never sees this app's other keys.
+| OS | Path |
+| --- | --- |
+| Windows | `%LOCALAPPDATA%\everything_agent\.env` |
+| macOS | `~/Library/Application Support/everything_agent/.env` |
+| Linux / robot | `~/.config/everything_agent/.env` |
 
-Add one or both under Settings → Advanced → Claude for hard questions:
+See [.env.example](.env.example) for every option. To reset a forgotten PIN, delete the
+`WEB_PIN_HASH` line and restart.
 
-| | Anthropic API key | Claude setup token |
-|---|---|---|
-| Get it | [platform.claude.com](https://platform.claude.com/settings/keys) | `claude setup-token` on any computer with Claude Code |
-| Paid by | Per question, on your API account | Your Claude plan |
-| How it runs | Claude API, called directly | Claude Code's agent through the [Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview), kept running between questions |
-| Answer starts (no web) | under a second | about a second |
-| Answer starts (web search) | a few seconds | 8 to 10 seconds |
-
-With both saved, a switch picks which one Reachy uses; if it fails before saying anything (a
-rejected key, a usage limit), Reachy tries the other. Anthropic doesn't allow third-party
-products to offer Claude plan sign-in unless it has approved them (see the Agent SDK
-overview's note), so the setup token is for your own use on your own robot; prefer the API key
-for anything you hand to others.
-
-New tools subclass `Tool` and are listed in `tools.available()`. A tool either returns a
-result the model then answers with, or (like `ask_claude`) works in the background and speaks
-through `announce` or, sentence by sentence, `announce_stream`.
-
-### Project layout
-
-```
-src/everything_agent/
-  main.py             Reachy Mini app entry point (what the robot's launcher starts)
-  runtime.py          keeps the web page up; starts and restarts the conversation
-  conversation/       the loop: listening, turn-taking, replies, history
-  audio/              microphone reader, speaker playback, interruption detection
-  voice/              Cartesia speech-to-text and voice, the language model client
-  tools/              what the model can do besides talking (ask_claude)
-  server/             web API, PIN sign-in, the setup checks
-  robot.py            the SDK: microphone, speaker, idle head motion, sleep and wake
-  desktop/            the desktop app's core: runs the robot software and the app
-  web/                the built web UI (committed, so installs from git work)
-ui/                   the React UI (same screens on web and desktop)
-desktop/              the Tauri desktop shell (window, tray, start at login)
-packaging/            PyInstaller recipe for the desktop app's core, and its license collector
-docs/                 screenshots
-```
-
-## Develop
+## Development
 
 ```bash
 uv sync
-cd ui && npm ci
-npm run dev                              # UI with hot reload, talking to a running app on :8042
+cd ui && npm ci && npm run dev      # UI with hot reload, against a running app on :8042
 ```
 
-Build the desktop app (Windows: `scripts\build_desktop.ps1`, macOS: `scripts/build_desktop.sh`).
-It builds the UI, packs the Python core with PyInstaller into `desktop/src-tauri/core/`,
-and bundles it into the installer. A debug shell (`cd desktop && npx tauri dev`) runs the
-core from the repository's `.venv` instead.
+Build the desktop app with `scripts/build_desktop.ps1` (Windows) or `scripts/build_desktop.sh`
+(macOS).
 
-## Settings
-
-Everything the app's Settings page changes lives in one `.env` file:
-`%LOCALAPPDATA%\everything_agent\.env` on Windows,
-`~/Library/Application Support/everything_agent/.env` on macOS and `~/.config/everything_agent/.env`
-on Linux and the robot. See [.env.example](.env.example) for every option. Forgot the PIN?
-Delete the `WEB_PIN_HASH` line and restart; the next visit sets a new one.
+```
+src/everything_agent/   Python app: conversation loop, audio, voice, tools, web server
+ui/                     React UI shared by the web page and the desktop app
+desktop/                Tauri desktop shell
+```
 
 ## Security
 
-- The web page asks for a PIN (6 characters or more). Wrong PINs lock that device out for five
-  minutes after five tries, and everyone out after 30 wrong tries in an hour. Changing the PIN
-  from a browser needs the current one.
-- On the robot, the first visitor chooses the PIN, so open the page yourself right after
-  installing. In the desktop app only its own window can set the first PIN.
-- The page is plain HTTP on your local network: use it on networks you trust.
-- Anyone who can talk to Reachy can ask Claude things, on your API account or Claude plan.
-  Claude can only search the web; it can't read files or change anything on the computer.
-- Report security problems privately to the maintainers rather than in a public issue.
+The web page is protected by a PIN and served over plain HTTP, so use it only on networks you
+trust. On the robot, set the PIN right after installing. Report vulnerabilities privately as
+described in [SECURITY.md](SECURITY.md).
 
 ## License
 
-Apache-2.0; see [LICENSE](LICENSE) and [NOTICE](NOTICE). The desktop installers also contain
-third-party software under its own licenses, listed in `THIRD_PARTY_LICENSES.txt` inside the app.
+Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
-Everything Agent is an independent project, not affiliated with or endorsed by Pollen Robotics,
-Hugging Face or Anthropic. Reachy Mini is a robot by Pollen Robotics and Hugging Face, and this
-app is built on its open-source SDK. Claude and Claude Code are trademarks of Anthropic, PBC.
+Everything Agent is an independent project, not affiliated with Pollen Robotics, Hugging Face
+or Anthropic.
