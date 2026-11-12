@@ -164,8 +164,7 @@ index.html, style.css the app's page in the Reachy Mini app store (a Hugging Fac
 
 ```bash
 uv sync --extra dev
-uv run pytest                                   # Python tests
-cd ui && npm ci && npm test              # UI tests
+cd ui && npm ci
 npm run dev                              # UI with hot reload, talking to a running app on :8042
 ```
 

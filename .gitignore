@@ -15,3 +15,12 @@ desktop/src-tauri/target/
 desktop/src-tauri/gen/
 desktop/src-tauri/core/
 *.log
+
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+.github/
+tests/
+*.test.ts
+*.test.tsx
+test-setup.ts
