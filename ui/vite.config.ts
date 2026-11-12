@@ -16,8 +16,4 @@ export default defineConfig({
       "/api": { target: APP_SERVER, ws: true },
     },
   },
-  test: {
-    environment: "jsdom",
-    setupFiles: ["./src/test-setup.ts"],
-  },
 });

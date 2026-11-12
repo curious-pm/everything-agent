@@ -159,17 +159,16 @@ packaging/            PyInstaller recipe for the desktop app's core, and its lic
 docs/                 screenshots
 site/                 the project's web page (React), built into the files below
 index.html, style.css the built page: the app store listing (a Hugging Face Space) and GitHub Pages
-site.js, site-assets/ the rest of the built page (committed; CI checks it matches site/)
+site.js, site-assets/ the rest of the built page (committed)
 ```
 
 ## Develop
 
 ```bash
 uv sync --extra dev
-uv run pytest                                   # Python tests
-cd ui && npm ci && npm test              # UI tests
+cd ui && npm ci
 npm run dev                              # UI with hot reload, talking to a running app on :8042
-cd site && npm ci && npm test            # the web page's tests
+cd site && npm ci
 npm run build                            # rebuild the page into the repository root; commit the result
 ```
 

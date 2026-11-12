@@ -14,7 +14,6 @@ export function OpenSource() {
         </p>
         <div className="actions">
           <a className="btn primary" href={REPO}>See the code on GitHub</a>
-          <a className="btn" href={`${REPO}/blob/main/CONTRIBUTING.md`}>Read how to contribute</a>
         </div>
       </div>
     </section>

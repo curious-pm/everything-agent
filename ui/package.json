@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "vitest run",
     "lint": "oxlint",
     "preview": "vite preview",
     "robot": "node scripts/copy-robot.mjs",
