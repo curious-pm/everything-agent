@@ -1,16 +1,3 @@
----
-title: Everything Agent
-emoji: 💬
-colorFrom: blue
-colorTo: gray
-sdk: static
-pinned: false
-short_description: Fast, hands-free voice conversation with Reachy Mini
-tags:
-  - reachy_mini
-  - reachy_mini_python_app
----
-
 # Everything Agent
 
 Hands-free voice conversation for [Reachy Mini](https://www.pollen-robotics.com/reachy-mini/).
