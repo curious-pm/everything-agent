@@ -24,3 +24,4 @@ tests/
 *.test.ts
 *.test.tsx
 test-setup.ts
+.DS_Store
