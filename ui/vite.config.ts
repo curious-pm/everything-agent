@@ -1,5 +1,5 @@
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vitest/config";
+import { defineConfig } from "vite";
 
 const APP_SERVER = process.env.REACHY_APP_SERVER ?? "http://127.0.0.1:8042";
 

@@ -73,7 +73,7 @@ first time.
 
 ```bash
 git clone https://github.com/curious-pm/Everything-Agent && cd Everything-Agent
-uv sync --extra dev                            # or: python -m venv .venv && pip install -e ".[dev]"
+uv sync                                        # or: python -m venv .venv && pip install -e .
 uv run reachy-mini-daemon --mockup-sim         # in another terminal; plain `reachy-mini-daemon` with the robot
 uv run python -m everything_agent
 ```
@@ -165,7 +165,7 @@ site.js, site-assets/ the rest of the built page (committed)
 ## Develop
 
 ```bash
-uv sync --extra dev
+uv sync
 cd ui && npm ci
 npm run dev                              # UI with hot reload, talking to a running app on :8042
 cd site && npm ci
