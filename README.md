@@ -16,7 +16,9 @@ tags:
 Hands-free voice conversation for [Reachy Mini](https://www.pollen-robotics.com/reachy-mini/).
 No wake word, no button: talk, and Reachy answers out loud, moving its head as it speaks.
 
-![Everything Agent home screen](docs/screenshot-home.png)
+https://github.com/user-attachments/assets/64e124a4-e29d-4925-b330-89da745c174e
+
+*Recorded from the app; voices regenerated with Cartesia.*
 
 It runs on the robot, as a desktop app on Windows and macOS (with or without a robot), and in
 any browser on the same network.
