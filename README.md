@@ -157,7 +157,6 @@ ui/                   the React UI (same screens on web and desktop)
 desktop/              the Tauri desktop shell (window, tray, start at login)
 packaging/            PyInstaller recipe for the desktop app's core, and its license collector
 docs/                 screenshots
-index.html, style.css the app's page in the Reachy Mini app store (a Hugging Face Space)
 ```
 
 ## Develop
