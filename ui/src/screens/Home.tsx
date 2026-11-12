@@ -16,11 +16,11 @@ const PHASE_LABEL: Record<Phase, string> = {
 };
 
 export function Home() {
-  const { state, lines, notice } = useLive();
+  const { state, lines, saying, notice } = useLive();
   const [drawer, setDrawer] = useState(false);
   const [error, setError] = useState("");
   const captionBox = useRef<HTMLParagraphElement>(null);
-  const words = caption(state, lines);
+  const words = caption(state, lines, saying);
   const lastYou = lines.findLast((l) => l.role === "user");
   const asleep = state.phase === "asleep";
   const speakerLabel = state.speaker_muted ? "Turn Reachy's speaker on" : "Mute Reachy's speaker";
@@ -37,7 +37,7 @@ export function Home() {
   };
 
   return (
-    <main className="home">
+    <main className={`home${drawer ? " with-drawer" : ""}`}>
       <div className="home-top">
         <span className="muted" />
         <div className="home-actions">

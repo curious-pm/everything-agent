@@ -14,6 +14,7 @@ export type LiveData = {
   state: LiveState;
   levels: { mic: number; speaker: number };
   lines: Line[];
+  saying: string;
   notice: string;
 };
 
@@ -25,14 +26,15 @@ export function applyMessage(data: LiveData, msg: ServerMessage): Partial<LiveDa
   if (msg.type === "levels") return { levels: { mic: msg.mic, speaker: msg.speaker } };
   if (msg.kind === "transcript" && (msg.role === "user" || msg.role === "assistant") && typeof msg.text === "string") {
     const line: Line = { role: msg.role, text: msg.text };
-    return { lines: [...data.lines, line].slice(-MAX_LINES), notice: msg.role === "user" ? "" : data.notice };
+    return { lines: [...data.lines, line].slice(-MAX_LINES), saying: "", notice: msg.role === "user" ? "" : data.notice };
   }
+  if (msg.kind === "saying" && typeof msg.text === "string") return { saying: `${data.saying} ${msg.text}`.trim() };
   if (msg.kind === "withdrawn" && typeof msg.text === "string") {
     const last = data.lines.at(-1);
     return last?.role === "user" && last.text === msg.text ? { lines: data.lines.slice(0, -1) } : {};
   }
   if (msg.kind === "problem" && typeof msg.text === "string") return { notice: msg.text };
-  if (msg.kind === "cleared") return { lines: [] };
+  if (msg.kind === "cleared") return { lines: [], saying: "" };
   return {};
 }
 
@@ -47,6 +49,7 @@ export const useLive = create<LiveStore>((set, get) => ({
   state: {},
   levels: { mic: 0, speaker: 0 },
   lines: [],
+  saying: "",
   notice: "",
 
   connect() {

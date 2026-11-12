@@ -6,7 +6,7 @@ import asyncio
 import logging
 import queue
 import time
-from typing import Protocol
+from typing import Callable, Protocol
 
 import numpy as np
 
@@ -56,6 +56,11 @@ class Speaker:
         if self._queue is not None and chunk.size:
             self._queue.put(chunk)
 
+    def when_reached(self, callback: Callable[[], None]) -> None:
+        """Run ``callback`` on the playback thread once the audio queued before it has been sent out."""
+        if self._queue is not None:
+            self._queue.put(callback)
+
     async def finish(self, interrupt: bool = False) -> float:
         """Seconds of audio played. With ``interrupt``, queued audio is dropped."""
         q, future = self._queue, self._future
@@ -73,7 +78,7 @@ class Speaker:
         rate = self.out.sample_rate
         self.out.begin_playback()
         deadline: float | None = None
-        held: list[np.ndarray] = []
+        held: list[np.ndarray | Callable[[], None]] = []
         held_s = 0.0
         released = False
         gain = 1.0
@@ -99,6 +104,15 @@ class Speaker:
             self.audible_until = deadline
             self.level = rms(chunk)
 
+        def send(item: np.ndarray | Callable[[], None]) -> None:
+            if not callable(item):
+                push(item)
+                return
+            try:
+                item()
+            except Exception:
+                logger.exception("A playback callback failed")
+
         try:
             while True:
                 if self.stop_now:
@@ -112,20 +126,21 @@ class Speaker:
                     interrupted = item == _INTERRUPT
                     break
                 if released:
-                    push(item)
+                    send(item)
                     continue
                 held.append(item)
-                held_s += item.size / rate
+                if not callable(item):
+                    held_s += item.size / rate
                 if held_s >= self.prebuffer_s:
                     released = True
-                    for chunk in held:
-                        push(chunk)
+                    for queued in held:
+                        send(queued)
                     held = []
             if interrupted:
                 self.out.clear_playback()
             else:
-                for chunk in held:
-                    push(chunk)
+                for queued in held:
+                    send(queued)
                 if deadline is not None:
                     time.sleep(max(0.0, deadline - time.monotonic()))
         finally:
