@@ -92,7 +92,7 @@ cd ui && npm ci && npm run dev      # UI with hot reload, against a running app 
 ```
 
 Build the desktop app with `scripts/build_desktop.ps1` (Windows) or `scripts/build_desktop.sh`
-(macOS). See [CONTRIBUTING.md](CONTRIBUTING.md) for the project's conventions and how to add a tool.
+(macOS).
 
 ```
 src/everything_agent/   Python app: conversation loop, audio, voice, tools, web server
