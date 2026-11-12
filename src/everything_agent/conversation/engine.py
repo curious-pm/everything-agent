@@ -454,6 +454,7 @@ class Conversation:
             sentence = speakable(sentence)
             if self._barge_in or not sentence:
                 continue
+            self.speaker.when_reached(lambda said=sentence: self.events.publish("saying", text=said))
             pending = np.zeros(0, dtype=np.float32)
             try:
                 async for audio in self.providers.voice.stream(sentence):
