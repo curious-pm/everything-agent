@@ -32,9 +32,9 @@ jobs:
         working-directory: site
       - name: Collect the page
         run: |
-          mkdir -p _site/docs
+          mkdir -p _site/docs/images
           cp -r index.html style.css site.js site-assets _site/
-          cp docs/*.png _site/docs/
+          cp docs/images/*.png _site/docs/images/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -10,7 +10,7 @@ export function Footer() {
         app is built on its open-source SDK. Claude is a trademark of Anthropic, PBC.
       </p>
       <p>
-        <a href={`${REPO}/blob/main/SECURITY.md`}>Report a security problem</a>
+        <a href={`${REPO}/blob/main/docs/SECURITY.md`}>Report a security problem</a>
       </p>
     </footer>
   );

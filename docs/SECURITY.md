@@ -25,5 +25,5 @@ Only the latest release gets security fixes.
 Problems in Reachy Mini's own software, Claude Code, or the speech and model providers belong
 with those projects.
 
-The README's [Security](README.md#security) section describes how the app is meant to be
+The README's [Security](../README.md#security) section describes how the app is meant to be
 protected and what it deliberately doesn't cover, such as plain HTTP on your local network.

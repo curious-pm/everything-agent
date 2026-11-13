@@ -1,6 +1,6 @@
 import { useState } from "react";
-import home from "../../../docs/screenshot-home.png";
-import settings from "../../../docs/screenshot-settings.png";
+import home from "../../../docs/images/screenshot-home.png";
+import settings from "../../../docs/images/screenshot-settings.png";
 import "./AppTour.css";
 
 const views = [
