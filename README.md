@@ -29,7 +29,7 @@ You enter the keys on the setup screen the first time you open the app. They sta
 **On the robot (Reachy Mini Wireless)**
 
 ```bash
-pip install git+https://github.com/curious-pm/Everything-Agent
+pip install git+https://github.com/curious-pm/everything-agent
 ```
 
 Start the app from the robot's dashboard and open <http://reachy-mini.local:8042>. The first
@@ -43,13 +43,14 @@ on Windows choose **More info → Run anyway**, on macOS right-click the app and
 **From source**
 
 ```bash
-git clone https://github.com/curious-pm/Everything-Agent && cd Everything-Agent
+git clone https://github.com/curious-pm/everything-agent && cd everything-agent
 uv sync
 uv run reachy-mini-daemon --mockup-sim   # in a second terminal; drop --mockup-sim with a robot
 uv run python -m everything_agent
 ```
 
-Then open <http://127.0.0.1:8042>.
+Then open <http://127.0.0.1:8042>. The [installation guide](docs/installation.md) has the details,
+including first-time setup and updating.
 
 ## How it works
 
@@ -64,18 +65,17 @@ response time; a faster provider can be set under **Settings → Advanced**.
 Questions that need the web or careful reasoning are handed to Claude through the `ask_claude`
 tool. Claude can only search the web; it can't read files or run commands.
 
-## Configuration
+## Documentation
 
-All settings are stored in a single `.env` file:
-
-| OS | Path |
+| Guide | |
 | --- | --- |
-| Windows | `%LOCALAPPDATA%\everything_agent\.env` |
-| macOS | `~/Library/Application Support/everything_agent/.env` |
-| Linux / robot | `~/.config/everything_agent/.env` |
-
-See [.env.example](.env.example) for every option. To reset a forgotten PIN, delete the
-`WEB_PIN_HASH` line and restart.
+| [Installation](docs/installation.md) | Robot, desktop app, or from source |
+| [Using Everything Agent](docs/usage.md) | Talking, interrupting, languages, settings, Claude |
+| [Configuration](docs/configuration.md) | Where settings live, and every option |
+| [Troubleshooting](docs/troubleshooting.md) | Logs and common problems |
+| [Architecture](docs/architecture.md) | How it works inside |
+| [Development](docs/development.md) | Running from source, tests, building the installers |
+| [Releasing](docs/releasing.md) | Publishing a new version |
 
 ## Development
 
@@ -83,24 +83,16 @@ See [.env.example](.env.example) for every option. To reset a forgotten PIN, del
 uv sync --extra dev
 uv run pytest                       # Python tests
 cd ui && npm ci && npm test         # UI tests
-npm run dev                         # UI with hot reload, against a running app on :8042
 ```
 
-Build the desktop app with `scripts/build_desktop.ps1` (Windows) or `scripts/build_desktop.sh`
-(macOS).
-
-```
-src/everything_agent/   Python app: conversation loop, audio, voice, tools, web server
-ui/                     React UI shared by the web page and the desktop app
-desktop/                Tauri desktop shell
-tests/                  Python tests, with a pretend robot and pretend cloud services
-```
+See [Development](docs/development.md) for running the app from source, working on the UI and the
+desktop app, and building the installers.
 
 ## Security
 
 The web page is protected by a PIN and served over plain HTTP, so use it only on networks you
 trust. On the robot, set the PIN right after installing. Report vulnerabilities privately as
-described in [SECURITY.md](SECURITY.md).
+described in [SECURITY.md](docs/SECURITY.md).
 
 ## License
 
