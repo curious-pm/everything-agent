@@ -88,7 +88,6 @@ scripts/build_desktop.sh     # macOS: .app and .dmg
 
 The script builds the UI, packs the Python core with PyInstaller into `desktop/src-tauri/core/`,
 collects third-party licenses, runs a smoke test on the packaged core, and builds the installer.
-See [Releasing](releasing.md) for publishing a release.
 
 ## Conventions
 
@@ -138,3 +137,14 @@ Tools are how Reachy does things besides talking.
   `<exe> --child <module>`; only modules listed in `desktop/children.py` can run that way. The
   installers leave out GStreamer's GPL and patent-restricted plugins, so the bundle stays
   LGPL-compatible.
+
+## Releasing
+
+1. Set the new version in `pyproject.toml`, `src/everything_agent/__init__.py`,
+   `desktop/src-tauri/tauri.conf.json`, `desktop/src-tauri/Cargo.toml` (and `Cargo.lock`),
+   `ui/package.json` and `desktop/package.json`, run `uv lock`, and push to `main`.
+2. Merge `main` into `launch-page`, which holds the release workflow, and set the same version in
+   `site/package.json`.
+3. Tag `launch-page` with `vX.Y.Z` and push the tag. The Release workflow builds the Windows and
+   macOS installers and opens a draft release with them attached.
+4. Write the release notes in the draft and publish it.
