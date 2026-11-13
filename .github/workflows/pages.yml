@@ -28,7 +28,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: site/package-lock.json
-      - run: npm ci && npm run build
+      - run: npm ci && npm run lint && npm test && npm run build
         working-directory: site
       - name: Collect the page
         run: |
