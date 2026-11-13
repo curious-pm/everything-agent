@@ -1,6 +1,6 @@
 [package]
 name = "everything-agent"
-version = "0.1.0"
+version = "1.0.0"
 description = "Everything Agent for Reachy Mini"
 license = "Apache-2.0"
 authors = ["Curious PM"]

@@ -21,9 +21,4 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 .github/ISSUE_TEMPLATE/
 .github/pull_request_template.md
-.github/workflows/ci.yml
-tests/
-*.test.ts
-*.test.tsx
-test-setup.ts
 .DS_Store
