@@ -62,8 +62,7 @@ uv run reachy-mini-daemon --mockup-sim   # in a second terminal; drop --mockup-s
 uv run python -m everything_agent
 ```
 
-Then open <http://127.0.0.1:8042>. The [installation guide](docs/installation.md) has the details,
-including first-time setup and updating.
+Then open <http://127.0.0.1:8042>.
 
 ## How it works
 
@@ -78,17 +77,12 @@ response time; a faster provider can be set under **Settings → Advanced**.
 Questions that need the web or careful reasoning are handed to Claude through the `ask_claude`
 tool. Claude can only search the web; it can't read files or run commands.
 
-## Documentation
+## Settings
 
-| Guide | |
-| --- | --- |
-| [Installation](docs/installation.md) | Robot, desktop app, or from source |
-| [Using Everything Agent](docs/usage.md) | Talking, interrupting, languages, settings, Claude |
-| [Configuration](docs/configuration.md) | Where settings live, and every option |
-| [Troubleshooting](docs/troubleshooting.md) | Logs and common problems |
-| [Architecture](docs/architecture.md) | How it works inside |
-| [Development](docs/development.md) | Running from source, tests, building the installers |
-| [Releasing](docs/releasing.md) | Publishing a new version |
+Everything the Settings page changes is stored in one `.env` file: `%LOCALAPPDATA%\everything_agent\`
+on Windows, `~/Library/Application Support/everything_agent/` on macOS, and
+`~/.config/everything_agent/` on Linux and the robot. [.env.example](.env.example) explains every
+option. Forgot the PIN? Delete the `WEB_PIN_HASH` line and restart.
 
 ## Development
 
