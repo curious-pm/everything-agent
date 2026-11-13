@@ -1,5 +1,9 @@
 # Everything Agent
 
+[![CI](https://github.com/curious-pm/everything-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/curious-pm/everything-agent/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/curious-pm/everything-agent)](https://github.com/curious-pm/everything-agent/releases/latest)
+[![License](https://img.shields.io/github/license/curious-pm/everything-agent)](LICENSE)
+
 Hands-free voice conversation for [Reachy Mini](https://www.pollen-robotics.com/reachy-mini/).
 No wake word, no button: talk, and Reachy answers out loud, moving its head as it speaks.
 
@@ -76,8 +80,10 @@ See [.env.example](.env.example) for every option. To reset a forgotten PIN, del
 ## Development
 
 ```bash
-uv sync
-cd ui && npm ci && npm run dev      # UI with hot reload, against a running app on :8042
+uv sync --extra dev
+uv run pytest                       # Python tests
+cd ui && npm ci && npm test         # UI tests
+npm run dev                         # UI with hot reload, against a running app on :8042
 ```
 
 Build the desktop app with `scripts/build_desktop.ps1` (Windows) or `scripts/build_desktop.sh`
@@ -87,6 +93,7 @@ Build the desktop app with `scripts/build_desktop.ps1` (Windows) or `scripts/bui
 src/everything_agent/   Python app: conversation loop, audio, voice, tools, web server
 ui/                     React UI shared by the web page and the desktop app
 desktop/                Tauri desktop shell
+tests/                  Python tests, with a pretend robot and pretend cloud services
 ```
 
 ## Security

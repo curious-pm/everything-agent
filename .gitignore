@@ -19,9 +19,6 @@ desktop/src-tauri/core/
 CHANGELOG.md
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
-.github/
-tests/
-*.test.ts
-*.test.tsx
-test-setup.ts
+.github/ISSUE_TEMPLATE/
+.github/pull_request_template.md
 .DS_Store
