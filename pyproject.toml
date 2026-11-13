@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "everything_agent"
-version = "0.1.0"
+version = "1.0.0"
 description = "Everything Agent: a fast, hands-free voice conversation app for Reachy Mini, with a web and desktop UI."
 readme = "README.md"
 license = { text = "Apache-2.0" }
